@@ -360,37 +360,49 @@ After choosing the loss function and calculate their corresponding derivation, I
 There will be two experiments which will be introduced. One is training the logistic regression and the other is training the linear classification. Both of them is trained in different kinds of gradient descent.
 
 \subsection{Dataset}
-This is two different tasks, so we have to use two different datasets. To train the linear regression model, I use the housing data in LIBSVM Data. There are 506 data and each of them has 13 attributes. For the linear classification tasks, I use the australian data in LIBSVM Data. There are 690 data and each of them has 14 attributes. All the datasets I use is the scaled version.
+I use a9a dataset in LIBSVM Data to train and test this two models. There are 32561 data in training set and 16281 data in test set. Each of them has 123 attribute.
 
 \subsection{Implementation}
-In this section, I will introduce the linear regression experiment and linear classification experiment in detail.
+In this section, I will introduce the logistic regression experiment and linear classification experiment in detail.
 
-In the linear regression experiment, the learning rate $\lambda$ is set to be 0.1. The weight matrix is initialized randomly. After I read the data from file, I split the dataset into training set and validation set. There are 354 data in training set and 152 data in validation set. The iteration's number is set to 300. The loss value of training set and validation set is described in Fig.~\ref{fig_1}.
+There are different kinds of gradient descent in this experiment, the parameters I used is in the following.
+
+\paragraph{Traditional Gradient Descent} Learning rate $a$ is set to be 0.1, and I will choose 20\% randomly of data from training set to train.
+
+\paragraph{NAG} Learning rate $\eta$ is set to be 0.1, and I will choose 20\% randomly of data from training set to train. $\gamma$ is set to be 0.9.
+
+\paragraph{RMSProp} Learning rate $\eta$ is set to be 0.02, and I will choose 20\% randomly of data from training set to train. $\gamma$ is set to be 0.9 and $\epsilon$ is set to be 1e-8.
+
+\paragraph{AdaDelta} $\gamma$ is set to be 0.95 and $\epsilon$ is set to be 1e-6.
+
+\paragraph{Adam} Learning rate $\eta$ is set to be 0.01. $\beta_1$ is set to be 0.999 $\beta_2$ is set to be 0.999 and $\epsilon$ is set to be 0.001.
+
+The weight matrix in my experiments is initialized randomly. The other parameters which will be update at each timestamp is set to be 0.
+
+Before training in logistic regression model, I set all the -1 label to 0 label. It can help me apply corresponding formula into this dataset easily. The iteration's number is set to 500. The loss value of test set is described in Fig.~\ref{fig_1}.
 \begin{figure}[htbp]
 \centerline{\includegraphics[height=150px]{line_1.png}}
-\caption{The loss value of training set and test set in linear regression.}
+\caption{The loss value of test set in logistic regression.}
 \label{fig_1}
 \end{figure}
 
-We can find that both of the loss of training set and test set decrease quickly at the beginning and close to unchange at the end of iterations. It means that the value of loss function is closed to global minimal value.
-
-In the linear classfication experiment, the learning rate $\lambda$ is set to be 0.1. The weight matrix is initialized randomly. I split the dataset into training set and validation set. There are 483 data in training set and 207 data in validation set. The iteration's number is set to 300. The loss value of training set and validation set is described in Fig.~\ref{fig_2}.
+In the linear classfication experiment, the parameters is set to be the same with the logistic regression. The loss value of test set is described in Fig.~\ref{fig_2}.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[height=150px]{line_2.png}}
-\caption{The loss value of training set and test set in linear classification.}
+\caption{The loss value of test set in linear classification.}
 \label{fig_2}
 \end{figure}
 
-We can find that both of the loss of training set and test set decrease quickly at the beginning and close to unchange at the end of iterations. It means that the value of loss function is closed to global minimal value.
+We can find that both of the loss of training set and test set decrease quickly at the beginning and close to unchange at the end of iterations. It means that the value of loss function is closed to minimal value. However, logistic regression can get a smaller value than linear classification. And logistic regression performs more stable since the curve of classification which is update by RMSProp is not smooth.
 
-After finish training, I set a threshold to classify the data in validation set. I set the threshold to be 0, if the value calculated by model is smaller than 0, the corresponding data will be classified into one class (the label of this class is -1). If the value is larger or equal than 0, the corresponding data will be classified into another class (the label of this class is 1). And then I calculate the precision, recall and f1-score which is shown in Table~\ref{table_1}.
+After finish training, I set a threshold to classify the data in validation set. I set the threshold to be 0.5 in logistic regression model, if the value calculated by model is smaller than 0.5, the corresponding data will be classified into one class (the label of this class is 0). If the value is larger or equal than 0.5, the corresponding data will be classified into another class (the label of this class is 1). The threshold in linear classification is 0. And then I calculate the precision, recall and f1-score which is shown in Table~\ref{table_1} and Table~\ref{table_2}.
 
     \begin{table}[!hbt]
 		% Center the table
 		\begin{center}
 		% Title of the table
-		\caption{Classification Results}
+		\caption{Classification Results in Logistic Regression}
 		\label{table_1}
 		% Table itself: here we have two columns which are centered and have lines to the left, right and in the middle: |c|c|
 		\begin{tabular}{|c|c|c|c|c|}
@@ -398,22 +410,54 @@ After finish training, I set a threshold to classify the data in validation set.
 			\hline
 			% To end a column type &
 			% For a linebreak type \\
-			  & precision & recall & f1-score & support \\
+			gradient descent  & precision & recall & f1-score & support \\
 			\hline
-			class1 & 0.93 & 0.81 & 0.87  & 117 \\
+			Traditional & 0.84 & 0.72 & 0.74  & 16281 \\
 			\hline
-			class2 & 0.79 & 0.92 & 0.85  & 90 \\
+			NAG & 0.85 & 0.68 & 0.70  & 16281 \\
 			\hline
-			avg / total & 0.87 & 0.86 & 0.86 & 207 \\
+			RMSProp & 0.58 & 0.76 & 0.66 & 16281 \\
+			\hline
+            AdaDelta & 0.58 & 0.76 & 0.66 & 16281 \\
+			\hline
+            Adam & 0.58 & 0.76 & 0.66 & 16281 \\
 			\hline
 		\end{tabular}
 		\end{center}
 	\end{table}
 
-From Table~\ref{table_1}, we can find that the precision, recall and f1-score of classification is larger than 0.85. It is a good result of linear classification.
+    \begin{table}[!hbt]
+		% Center the table
+		\begin{center}
+		% Title of the table
+		\caption{Classification Results in Linear Classification}
+		\label{table_2}
+		% Table itself: here we have two columns which are centered and have lines to the left, right and in the middle: |c|c|
+		\begin{tabular}{|c|c|c|c|c|}
+			% To create a horizontal line, type \hline
+			\hline
+			% To end a column type &
+			% For a linebreak type \\
+			gradient descent  & precision & recall & f1-score & support \\
+			\hline
+			Traditional & 0.58 & 0.76 & 0.66 & 16281 \\
+			\hline
+			NAG & 0.58 & 0.76 & 0.66  & 16281 \\
+			\hline
+			RMSProp & 0.82 & 0.76 & 0.77 & 16281 \\
+			\hline
+            AdaDelta & 0.58 & 0.76 & 0.66 & 16281 \\
+			\hline
+            Adam & 0.58 & 0.76 & 0.66 & 16281 \\
+			\hline
+		\end{tabular}
+		\end{center}
+	\end{table}
+
+From Table~\ref{table_1}, we can find that the traditional gradient descent and NAG get a better result than the other in logistic regression. I consider that it may be the problems from hyperparameters. I don't adjust a good value for other methods. However, we can find that the result in Table~\ref{table_2} is a bit different in Table~\ref{table_1}. Some methods perform quite different in two models. I consider that the hyperparameters which is suitable to one model may not be also suitable to other models.
 
 \section{Conclusion}
-In this experiment, I implement gradient descent in linear regression and linear classification. Both of their weight matrix is updated so that corresponding loss functions can be minimized. However, the loss function I use is convex, so that I don't need to care about the problem of local minimal. If the loss function is non-convex, gradient descent maybe fail to find the global minimal. Learning how to use gradient descent to get global minimal in non-convex function is my future work.
+In this experiment, I implement gradient descent in logistic regression and linear classification. And I use different kinds of gradient descent to optimize the models. I find that the hyperparameters play important roles in models. Hyperparameters will influence the result directly. And the result of two models also show that the hyperparameters which are suitable to one model may not suitable to other models. How to set a proper hyperparameters to models is an important problem.
 
 % Your document ends here!
 \end{document}

@@ -218,7 +218,7 @@ Gradient descent plays an important role in machine learning. It can help us get
 % Each section begins with a \section{title} command
 \section{Introduction}
 	% \PARstart{}{} creates a tall first letter for this first paragraph
-\PARstart{G}{radient} descent is a important method in machine learning. The most important tasks in many machine learning models is to update or calculate their parameters which can lead the corresponding loss functions value to be minimal value. Although gradient descent is widely used, researchers find that it has its own limitation. Therefore, there are many modified gradient descent methods which are proposed, \emph{e.g}. NAG, RMSProp, AdaDelta.
+\PARstart{G}{radient} descent is a important method in machine learning. The most important tasks in many machine learning models is to update or calculate their parameters which can lead the corresponding loss functions value to be minimal value. Although gradient descent is widely used, researchers find that it has its own limitation. Therefore, there are many modified gradient descent methods which are proposed, \emph{e.g}. NAG, RMSProp, AdaDelta. In this experiment, I implement logistic regression and linear classification. And I use different methods to optimize their loss functions. My experiments' results show that all of them can lead the loss functions to global minimal. However, their speed may be different.
 
 % Main Part
 \section{Methods and Theory}
@@ -228,41 +228,57 @@ a_{t+1}=a_{t} + \lambda \Delta F(a_{t}) \label{eq1}
 \end{equation}
 where $a_{t}$ is the value of $a$ at time $t$, $\lambda$ is the learning rate which is always set to be a small value like 0.1. $\Delta F(a_{t})$ is the gradient value of $F(a_{t})$.
 
-There are two experiments in my work. One is linear regression, the other is linear classification. Therefore I have to choose different loss function to different tasks.
+There are two experiments in my work. One is logistic regression, the other is linear classification. Therefore I have to choose different loss function to different tasks.
 
-Linear regression is a linear approach for modeling the relationship between a scalar dependent variable $y$ and one or more explanatory variables denoted $X$. It can be calculated as following
+Logistic regression is a function that its output is limited from 0 to 1. It can be calculated as following:
 \begin{equation}
-y' = W^TX+b \label{eq2}
+y' = 1/(1+e^{-z}) \label{eq2}
 \end{equation}
-where $W$ is the weight matrix, and $b$ is the bias variable. However, we can add a new column to $X$ to be $X'$ where the column is all 1. Therefore, we can not use $b$ anymore, since the weight of the all 1 column can act the role of $b$. $y$ can be calculated as following
+where
 \begin{equation}
-y' = W^TX' \label{eq3}
+z = W^TX+b \label{eq3}
 \end{equation}
-
-
-Then, I choose the loss function which is described in Eq.~\eqref{eq4}
-\begin{equation}
-L_1 = 1/{2m} \sum_{i=1}^m(y'_i-y_i)^2 \label{eq4}
-\end{equation}
-where $m$ is the total number of data and $y_i$ is the value of training data. $y'_i$ is the value which is calculated by linear model. To use the gradient descent to optimize the model, we have to calculate the derivation of Eq.~\eqref{eq4}.
-\begin{equation}
-\Delta L_1 / \Delta w = 1/(2m) \sum_{i=1}^m 2(y'_i-y_i)x_i = 1/m \sum_{i=1}^m (y'_i-y_i)x_i
-\label{eq5}
+where $W$ is the weight matrix and $b$ is the bias variable. However, we can add 1 at the end of $X$ so that the weight of the last column can act at the bias variable. Note $X'$ to be the features which is add 1 at the last column. We can calculate $z$ as following:
+ \begin{equation}
+z = W^TX' \label{eq4}
 \end{equation}
 
-Now, we can use Eq.~\eqref{eq5} to calculate derivative at each step and update weight in Eq.~\eqref{eq1}. After several iterations with a suitable learning rate, we can get a weight matrix which can lead the loss function's value into global minimal.
+To train the logistic regression, I choose log-likehood function as my loss function. It can be calculated by Eq.~\eqref{eq5}
+\begin{equation}
+L_1 = -1/n[\sum_{i=1}^ny_ilog h_w(x_i) + (1-y_i)log(1-h_w(x_i))] \label{eq5}
+\end{equation}
+where
+\begin{equation}
+h_w(X) = 1/(1+e^{-W^TX}) \label{eq6}
+\end{equation}
+In Eq.~\eqref{eq5}, $n$ is the total number of data and $y_i$ is the target value of data. The next step is to calculate the derivation of Eq.~\eqref{eq5}. The calculation process is in the following:
+\begin{equation}
+\begin{aligned}
+\Delta L_1 / \Delta w & = -y*1/h_w(X)*{\Delta h_w(X)}/{\Delta W} + \\
+& \quad \ (1-y)*1/(1-h_w(X))*{\Delta h_w(X)}/{\Delta W} \\
+& =(h_w(X)-y)X
+\label{eq7}
+\end{aligned}
+\end{equation}
 
-In the linear classification task, I also use the Eq.~\eqref{eq3}. Since it is a different task, I choose another loss function. The loss function I choose is called hinge loss, which can be described in Eq.~\eqref{eq6}
+After we get the the derivation of Eq.~\eqref{eq6}, we can calculate the derivative according to Eq.~\eqref{eq7} and update weight matrix according Eq.~\eqref{eq1}
+
+In the linear classification task, I use the Eq.~\eqref{eq8} to calculate output.
+\begin{equation}
+y' = W^TX' \label{eq8}
+\end{equation}
+
+Since the function is different, I choose another loss function. The loss function I choose is called hinge loss, which can be described in Eq.~\eqref{eq9}
 \begin{equation}
 L_2 = \begin{Vmatrix}W\end{Vmatrix}^2/2 + C/m \sum_{i=1}^m max(0, 1-y_i(W^Tx_i+b))
-\label{eq6}
+\label{eq9}
 \end{equation}
 where $C$ is a hyperparameter which can be adjusted in different dataset.
 
-To use the gradient descent to optimize the weight matrix, we have to calculate the the derivation of Eq.~\eqref{eq6}.
+To use the gradient descent to optimize the weight matrix, we have to calculate the the derivation of Eq.~\eqref{eq9}.
 \begin{equation}
 \Delta L_2 / \Delta w = W + C/m\sum_{i=1}^m g_w(x_i)
-\label{eq7}
+\label{eq10}
 \end{equation}
 where
 \begin{equation}
@@ -270,15 +286,78 @@ g_w(x_i)=\begin{cases}
 -y_ix_i\quad 1-y_i(W^Tx'_i) \geq 0 \\
 0\quad \quad \quad 1-y_i(W^Tx'_i) < 0 \\
 \end{cases}
-\label{eq8}
+\label{eq11}
 \end{equation}
 
-We can update the linear classification according to Eq.~\eqref{eq1} and use Eq.~\eqref{eq8} to calculate the derivative.
+We can update the linear classification according to Eq.~\eqref{eq1} and use Eq.~\eqref{eq11} to calculate the derivative.
 
-After choosing the loss function and calculate their corresponding derivation, I can use gradient descent to train these two models. My experiment will be described in following.
+In this experiment, I not only used traditional gradient descent to train the models, but also use modified gradient descent. Their introduction is in the following.
+
+Nesterov accelerated gradient(NAG) is method which considered momentum. It can be calculated as following:
+\begin{equation}
+g_t=\Delta L(W_{t-1} - \gamma v_{t-1}) \label{eq12}
+\end{equation}
+\begin{equation}
+v_t = \gamma v_{t-1} + \eta g_t \label{eq13}
+\end{equation}
+\begin{equation}
+W_t = W_{t-1} - v_t \label{eq14}
+\end{equation}
+where $\gamma$ and $\eta$ are hyperparameters which can be set to be 0.9 and 0.1 respectively.
+
+RMSProp is a method which can solve the problem of AdaGrad that the learning rate tends to be 0. It can be calculated as following:
+\begin{equation}
+g_t=\Delta L(W_{t-1}) \label{eq15}
+\end{equation}
+\begin{equation}
+G_t = \gamma G_{t-1} + (1-\gamma)g_t^2 \label{eq16}
+\end{equation}
+\begin{equation}
+W_t = W_{t-1} - (\eta / \sqrt{G_t+\epsilon}) * g_t \label{eq17}
+\end{equation}
+
+AdaDelta is a special method that we don't need to set the learning rate. It can be calculated as following:
+\begin{equation}
+g_t=\Delta L(W_{t-1}) \label{eq18}
+\end{equation}
+\begin{equation}
+G_t = \gamma G_{t-1} + (1-\gamma)g_t^2 \label{eq19}
+\end{equation}
+\begin{equation}
+\Delta weight = -(\sqrt{\Delta_{t-1} + \epsilon}) / (\sqrt{G_{t} + \epsilon}) * g_t \label{eq20}
+\end{equation}
+\begin{equation}
+weight = weight + \Delta weight \label{eq21}
+\end{equation}
+\begin{equation}
+\Delta_{t}=\gamma \Delta_{t-1} + (1-\gamma)\Delta weight^2 \label{eq22}
+\end{equation}
+
+Adaptive estimates of lower-order moments (Adam) can be calculated as:
+\begin{equation}
+g_t=\Delta L(W_{t-1}) \label{eq23}
+\end{equation}
+\begin{equation}
+m_t=\beta_1 \cdot m_{t-1} + (1-\beta_1) \cdot g_t \label{eq24}
+\end{equation}
+\begin{equation}
+v_t=\beta_2 \cdot v_{t-1} + (1-\beta_2) \cdot g_t^2 \label{eq25}
+\end{equation}
+\begin{equation}
+m'_t=m_t/(1-\beta_1^t) \label{eq26}
+\end{equation}
+\begin{equation}
+v'_t=v_t/(1-\beta_2^t) \label{eq27}
+\end{equation}
+\begin{equation}
+weight = weight - \eta m'_t / (\sqrt{v'_t+\epsilon})
+\end{equation}
+where $t$ is initialized to be 0 and add 1 at each step.
+
+After choosing the loss function and calculate their corresponding derivation, I can use different kinds of gradient descent to train these two models. My experiment will be described in following.
 
 \section{Experiments}
-There will be two experiments which will be introduced. One is training the linear regression and the other is training the linear classification. Both of them is trained in gradient descent.
+There will be two experiments which will be introduced. One is training the logistic regression and the other is training the linear classification. Both of them is trained in different kinds of gradient descent.
 
 \subsection{Dataset}
 This is two different tasks, so we have to use two different datasets. To train the linear regression model, I use the housing data in LIBSVM Data. There are 506 data and each of them has 13 attributes. For the linear classification tasks, I use the australian data in LIBSVM Data. There are 690 data and each of them has 14 attributes. All the datasets I use is the scaled version.

@@ -350,7 +350,7 @@ m'_t=m_t/(1-\beta_1^t) \label{eq26}
 v'_t=v_t/(1-\beta_2^t) \label{eq27}
 \end{equation}
 \begin{equation}
-weight = weight - \eta m'_t / (\sqrt{v'_t+\epsilon})
+weight = weight - \eta m'_t / (\sqrt{v'_t}+\epsilon)
 \end{equation}
 where $t$ is initialized to be 0 and add 1 at the beginning of each iterations.
 
@@ -412,9 +412,9 @@ After finish training, I set a threshold to classify the data in test set. I set
 			% For a linebreak type \\
 			gradient descent  & precision & recall & f1-score & support \\
 			\hline
-			Traditional & 0.84 & 0.79 & 0.80  & 16281 \\
+			Traditional & 0.84 & 0.71 & 0.73  & 16281 \\
 			\hline
-			NAG & 0.85 & 0.71 & 0.73  & 16281 \\
+			NAG & 0.85 & 0.68 & 0.70  & 16281 \\
 			\hline
 			RMSProp & 0.58 & 0.76 & 0.66 & 16281 \\
 			\hline
@@ -444,7 +444,7 @@ After finish training, I set a threshold to classify the data in test set. I set
 			\hline
 			NAG & 0.58 & 0.76 & 0.66  & 16281 \\
 			\hline
-			RMSProp & 0.82 & 0.76 & 0.77 & 16281 \\
+			RMSProp & 0.82 & 0.77 & 0.78 & 16281 \\
 			\hline
             AdaDelta & 0.58 & 0.76 & 0.66 & 16281 \\
 			\hline
@@ -457,7 +457,7 @@ After finish training, I set a threshold to classify the data in test set. I set
 From Table~\ref{table_1}, we can find that the traditional gradient descent and NAG get a better result than the other in logistic regression. I consider that it may be the problems from hyperparameters. I don't adjust a good value for all of the methods. However, we can find that the result in Table~\ref{table_2} is a bit different in Table~\ref{table_1}. Some methods perform quite different in two models. I consider that the hyperparameters which is suitable to one model may not be also suitable to other models.
 
 \section{Conclusion}
-In this experiment, I implement gradient descent in logistic regression and linear classification. And I use different kinds of gradient descent to optimize the models. I find that the hyperparameters play important roles in models. Hyperparameters will influence the result directly. And the results of two models also show that the hyperparameters which are suitable to one model may not suitable to other models. How to set a proper hyperparameters to models is an important problem. Different gradient descent methods can lead different curves of the same loss function. It means that each of them may be suitable for different kinds of data. 
+In this experiment, I implement gradient descent in logistic regression and linear classification. And I use different kinds of gradient descent to optimize the models. I find that the hyperparameters play important roles in models. Hyperparameters will influence the result directly. And the results of two models also show that the hyperparameters which are suitable to one model may not suitable to other models. How to set a proper hyperparameters to models is an important problem. Different gradient descent methods can lead different curves of the same loss function. It means that each of them may be suitable for different kinds of data.
 
 % Your document ends here!
 \end{document}
